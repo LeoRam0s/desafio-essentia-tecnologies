@@ -5,10 +5,18 @@ import { AuthController } from './auth.controller.js';
 import { UserRepository } from '../user/user.repository.js';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
 import { RedisService } from '../../infra/redis/redis.service.js';
+import { AuthGuard } from './guards/auth.guard.js';
 
 @Module({
   imports: [JwtModule.register({})],
   controllers: [AuthController],
-  providers: [AuthService, UserRepository, PrismaService, RedisService],
+  providers: [
+    AuthService,
+    UserRepository,
+    PrismaService,
+    RedisService,
+    AuthGuard,
+  ],
+  exports: [AuthGuard],
 })
 export class AuthModule {}
