@@ -12,3 +12,18 @@ services:
 
     ports:
       - '${DB_PORT}:3306'
+  redis:
+    image: redis:alpine
+    container_name: redis_essential_tech
+    command: [
+        'redis-server', # Command to run Redis server
+        '--maxmemory', # Set maximum memory usage
+        '100mb', # Limit Redis memory to 100MB (entorno de 30k tokens)
+        '--maxmemory-policy', # policy for handling memory limits
+        'allkeys-lru', # remove least recently used keys when memory limit is reached
+        '--requirepass',
+        '${REDIS_PASSWORD}', # Password for Redis server
+      ]
+    restart: always
+    ports:
+      - '${REDIS_PORT}:6379'
