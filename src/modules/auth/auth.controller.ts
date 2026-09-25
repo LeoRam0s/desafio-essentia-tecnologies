@@ -17,8 +17,10 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service.js';
+import { RefreshTokenDto } from './dto/refresh-token.dto.js';
 import { SigninDto } from './dto/signin.dto.js';
 import { SignupDto } from './dto/signup.dto.js';
+import { RefreshTokenSwagger } from './docs/refresh-token.swagger.js';
 import { SigninLocalSwagger } from './docs/signin-local.swagger.js';
 import { SignupLocalSwagger } from './docs/signup-local.swagger.js';
 
@@ -79,7 +81,25 @@ export class AuthController {
 
   @Post('refresh-token')
   @HttpCode(HttpStatus.OK)
-  async refreshToken() {
+  @ApiOperation({
+    summary: RefreshTokenSwagger.summary,
+    description: RefreshTokenSwagger.description,
+  })
+  @ApiBody({
+    type: RefreshTokenDto,
+    examples: {
+      refreshToken: {
+        summary: 'Valid refresh token payload',
+        value: RefreshTokenSwagger.bodyExample,
+      },
+    },
+  })
+  @ApiOkResponse(RefreshTokenSwagger.okResponse)
+  @ApiBadRequestResponse(RefreshTokenSwagger.badRequestResponse)
+  @ApiUnauthorizedResponse(RefreshTokenSwagger.unauthorizedResponse)
+  async refreshToken(@Body() body: RefreshTokenDto) {
     this.logger.debug('Refresh token endpoint called');
+
+    return await this.authService.refreshToken(body);
   }
 }
