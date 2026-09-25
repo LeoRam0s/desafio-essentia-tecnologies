@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  userId String @id @unique @default(uuid()) @map("pk_user_id")
+  name String @db.VarChar(100)
+  email String @unique @db.VarChar(100)
+  password String @db.VarChar(60)
+  tasks Task[]
+
+  @@map("tb_users")
+}
+
+model Task {
+  taskId          String    @id @unique @default(uuid()) @map("pk_task_id")
+  title           String    @db.VarChar(100)
+  description     String?   @db.VarChar(500)
+  userId          String    @map("fk_user_id")
+  taskPriorityId  Int       @map("fk_priority_id") @db.SmallInt
+  taskStatusId    Int       @map("fk_status_id") @db.SmallInt
+  dueDate         DateTime? @map("due_date")
+  completedAt     DateTime? @map("completed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [userId])
+  priority    TaskPriority @relation(fields: [taskPriorityId], references: [taskPriorityId])
+  status      TaskStatus   @relation(fields: [taskStatusId], references: [taskStatusId])
+
+  @@map("tb_tasks")
+}
+
+model TaskPriority {
+  taskPriorityId Int @id @unique @default(autoincrement()) @db.SmallInt @map("pk_task_priority_id")
+  name String @db.VarChar(50)
+  description String @db.VarChar(100)
+
+  // Relations
+  tasks Task[]
+
+  @@map("tb_task_priority")
+}
+
+model TaskStatus {
+  taskStatusId Int @id @unique @default(autoincrement()) @db.SmallInt @map("pk_task_status_id")
+  name String @db.VarChar(50)
+  description String @db.VarChar(100)
+
+  // Relations
+  tasks Task[]
+
+  @@map("tb_task_status")
+}
