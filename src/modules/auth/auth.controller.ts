@@ -11,11 +11,15 @@ import {
   ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service.js';
+import { SigninDto } from './dto/signin.dto.js';
 import { SignupDto } from './dto/signup.dto.js';
+import { SigninLocalSwagger } from './docs/signin-local.swagger.js';
 import { SignupLocalSwagger } from './docs/signup-local.swagger.js';
 
 @ApiTags('Auth')
@@ -46,19 +50,31 @@ export class AuthController {
   async signup(@Body() body: SignupDto) {
     this.logger.debug('Signup endpoint called | body: ', body);
 
-    const user = await this.authService.signup(body);
-
-    return {
-      userId: user.userId,
-      name: user.name,
-      email: user.email,
-    };
+    return await this.authService.signup(body);
   }
 
   @Post('signin')
   @HttpCode(HttpStatus.OK)
-  async signin() {
+  @ApiOperation({
+    summary: SigninLocalSwagger.summary,
+    description: SigninLocalSwagger.description,
+  })
+  @ApiBody({
+    type: SigninDto,
+    examples: {
+      signin: {
+        summary: 'Valid signin payload',
+        value: SigninLocalSwagger.bodyExample,
+      },
+    },
+  })
+  @ApiOkResponse(SigninLocalSwagger.okResponse)
+  @ApiBadRequestResponse(SigninLocalSwagger.badRequestResponse)
+  @ApiUnauthorizedResponse(SigninLocalSwagger.unauthorizedResponse)
+  async signin(@Body() body: SigninDto) {
     this.logger.debug('Signin endpoint called');
+
+    return await this.authService.signin(body);
   }
 
   @Post('refresh-token')
