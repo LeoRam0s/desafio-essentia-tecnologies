@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   validateSync,
 } from 'class-validator';
@@ -40,6 +41,38 @@ export class EnvironmentVariables {
   @IsNotEmpty()
   @IsString()
   DB_NAME: string;
+
+  @IsNotEmpty()
+  @IsString()
+  REDIS_HOST: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  REDIS_PORT: number;
+
+  @IsOptional()
+  @IsString()
+  REDIS_USER: string;
+
+  @IsOptional()
+  @IsString()
+  REDIS_PASSWORD: string;
+
+  @IsNotEmpty()
+  @IsString()
+  JWT_SECRET: string;
+
+  @IsNotEmpty()
+  @IsString()
+  JWT_REFRESH_SECRET: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  JWT_ACCESS_TOKEN_EXPIRES_IN: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  JWT_REFRESH_TOKEN_EXPIRES_IN: number;
 }
 
 export const envValidation = (config: Record<string, unknown>) => {
