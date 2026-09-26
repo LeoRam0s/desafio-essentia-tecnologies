@@ -11,13 +11,6 @@ export const SignupLocalSwagger = {
   },
   createdResponse: {
     description: 'User created successfully.',
-    schema: {
-      example: {
-        userId: '550e8400-e29b-41d4-a716-446655440000',
-        name: 'João Silva',
-        email: 'joao.silva@example.com',
-      },
-    },
   } satisfies ApiResponseOptions,
   badRequestResponse: {
     description: 'Invalid or missing name, email, or password.',

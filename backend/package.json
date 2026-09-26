@@ -12,8 +12,8 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "db:up": "docker-compose up -d",
-    "db:down": "docker-compose down",
+    "db:up": "docker-compose -f ../docker-compose.yaml up -d",
+    "db:down": "docker-compose -f ../docker-compose.yaml down",
     "db:migrate": "prisma migrate dev --name init && prisma generate"
   },
   "dependencies": {
