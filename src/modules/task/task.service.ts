@@ -6,6 +6,9 @@ import { UserRepository } from '../user/user.repository.js';
 import { UserNotFoundError } from '../user/errors/user-not-found.error.js';
 import { TaskStatus } from './enums/task-status.enum.js';
 import { TaskNotFoundError } from './errors/task-not-found.error.js';
+import { TaskForbiddenError } from './errors/task-forbidden.error.js';
+import { Prisma, Task } from '../../generated/prisma/client.js';
+import { NoChangesToUpdateError } from './errors/no-changes-to-update.error.js';
 
 @Injectable()
 export class TaskService {
@@ -33,8 +36,37 @@ export class TaskService {
   }
 
   async findOne(taskId: string, userId: string) {
-    await this.validateUserExists(userId);
+    const [, task] = await Promise.all([
+      this.validateUserExists(userId),
+      this.getTaskByIdOrThrow(taskId),
+    ]);
 
+    if (task.userId !== userId) throw new TaskForbiddenError(taskId);
+
+    return task;
+  }
+
+  async update(taskId: string, updateTaskDto: UpdateTaskDto, userId: string) {
+    const [, task] = await Promise.all([
+      this.validateUserExists(userId),
+      this.getTaskByIdOrThrow(taskId),
+    ]);
+
+    if (task.userId !== userId) throw new TaskForbiddenError(taskId);
+
+    const data = this.getChangedData(updateTaskDto, task);
+
+    if (Object.keys(data).length === 0)
+      throw new NoChangesToUpdateError(taskId);
+
+    return await this.taskRepository.update(taskId, data);
+  }
+
+  remove(id: number) {
+    return `This action removes a #${id} task`;
+  }
+
+  private async getTaskByIdOrThrow(taskId: string) {
     const task = await this.taskRepository.findById(taskId);
 
     if (!task) throw new TaskNotFoundError(taskId);
@@ -42,12 +74,42 @@ export class TaskService {
     return task;
   }
 
-  update(id: number, _updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
-  }
+  private getChangedData(
+    dto: UpdateTaskDto,
+    task: Task,
+  ): Prisma.TaskUncheckedUpdateInput {
+    const data: Prisma.TaskUncheckedUpdateInput = {};
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+    if (dto.title !== undefined && dto.title !== task.title) {
+      data.title = dto.title;
+    }
+
+    if (dto.description !== undefined && dto.description !== task.description) {
+      data.description = dto.description;
+    }
+
+    if (
+      dto.taskPriorityId !== undefined &&
+      Number(dto.taskPriorityId) !== task.taskPriorityId
+    ) {
+      data.taskPriorityId = dto.taskPriorityId;
+    }
+
+    if (
+      dto.dueDate !== undefined &&
+      dto.dueDate?.getTime() !== task.dueDate?.getTime()
+    ) {
+      data.dueDate = dto.dueDate;
+    }
+
+    if (
+      dto.completedAt !== undefined &&
+      dto.completedAt?.getTime() !== task.completedAt?.getTime()
+    ) {
+      data.completedAt = dto.completedAt;
+    }
+
+    return data;
   }
 
   private async validateUserExists(userId: string) {

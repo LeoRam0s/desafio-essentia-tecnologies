@@ -16,6 +16,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -32,6 +33,7 @@ import { UpdateTaskDto } from './dto/update-task.dto.js';
 import { CreateTaskSwagger } from './docs/create-task.swagger.js';
 import { FindAllTasksSwagger } from './docs/find-all-tasks.swagger.js';
 import { FindOneTaskSwagger } from './docs/find-one-task.swagger.js';
+import { UpdateTaskSwagger } from './docs/update-task.swagger.js';
 
 @ApiTags('Tasks')
 @Controller('task')
@@ -98,9 +100,34 @@ export class TaskController {
     return this.taskService.findOne(taskId, currentUser.userId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.taskService.update(+id, updateTaskDto);
+  @Patch(':taskId')
+  @ApiOperation({
+    summary: UpdateTaskSwagger.summary,
+    description: UpdateTaskSwagger.description,
+  })
+  @ApiParam(UpdateTaskSwagger.taskIdParam)
+  @ApiBody({
+    type: UpdateTaskDto,
+    examples: {
+      updateTask: {
+        summary: 'Valid partial task payload',
+        value: UpdateTaskSwagger.bodyExample,
+      },
+    },
+  })
+  @ApiOkResponse(UpdateTaskSwagger.okResponse)
+  @ApiBadRequestResponse(UpdateTaskSwagger.badRequestResponse)
+  @ApiUnauthorizedResponse(UpdateTaskSwagger.unauthorizedResponse)
+  @ApiForbiddenResponse(UpdateTaskSwagger.forbiddenResponse)
+  @ApiNotFoundResponse(UpdateTaskSwagger.notFoundResponse)
+  update(
+    @Param('taskId') taskId: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+    @CurrentUser() currentUser: CurrentUserDto,
+  ) {
+    this.logger.debug('Update task endpoint called');
+
+    return this.taskService.update(taskId, updateTaskDto, currentUser.userId);
   }
 
   @Delete(':id')

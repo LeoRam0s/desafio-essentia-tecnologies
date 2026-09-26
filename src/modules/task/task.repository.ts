@@ -17,4 +17,11 @@ export class TaskRepository {
   async findById(taskId: string) {
     return await this.prismaService.task.findUnique({ where: { taskId } });
   }
+
+  async update(taskId: string, data: Prisma.TaskUncheckedUpdateInput) {
+    return await this.prismaService.task.update({
+      where: { taskId },
+      data,
+    });
+  }
 }
