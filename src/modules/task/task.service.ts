@@ -5,6 +5,7 @@ import { TaskRepository } from './task.repository.js';
 import { UserRepository } from '../user/user.repository.js';
 import { UserNotFoundError } from '../user/errors/user-not-found.error.js';
 import { TaskStatus } from './enums/task-status.enum.js';
+import { TaskNotFoundError } from './errors/task-not-found.error.js';
 
 @Injectable()
 export class TaskService {
@@ -14,25 +15,31 @@ export class TaskService {
   ) {}
 
   async create(createTaskDto: CreateTaskDto, userId: string) {
-    const userExists = await this.userRepository.findById(userId);
-
-    if (!userExists) throw new UserNotFoundError(userId);
+    await this.validateUserExists(userId);
 
     const taskToCreate = {
       ...createTaskDto,
-      userId: userId,
+      userId,
       taskStatusId: TaskStatus.TO_DO,
     };
 
     return await this.taskRepository.create(taskToCreate);
   }
 
-  findAll() {
-    return `This action returns all task`;
+  async findAll(userId: string) {
+    await this.validateUserExists(userId);
+
+    return await this.taskRepository.findAllByUserId(userId);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} task`;
+  async findOne(taskId: string, userId: string) {
+    await this.validateUserExists(userId);
+
+    const task = await this.taskRepository.findById(taskId);
+
+    if (!task) throw new TaskNotFoundError(taskId);
+
+    return task;
   }
 
   update(id: number, _updateTaskDto: UpdateTaskDto) {
@@ -41,5 +48,11 @@ export class TaskService {
 
   remove(id: number) {
     return `This action removes a #${id} task`;
+  }
+
+  private async validateUserExists(userId: string) {
+    const userExists = await this.userRepository.findById(userId);
+
+    if (!userExists) throw new UserNotFoundError(userId);
   }
 }

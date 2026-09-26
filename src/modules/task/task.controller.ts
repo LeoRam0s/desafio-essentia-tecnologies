@@ -17,7 +17,9 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiNotFoundResponse,
+  ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -28,6 +30,8 @@ import { TaskService } from './task.service.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
 import { CreateTaskSwagger } from './docs/create-task.swagger.js';
+import { FindAllTasksSwagger } from './docs/find-all-tasks.swagger.js';
+import { FindOneTaskSwagger } from './docs/find-one-task.swagger.js';
 
 @ApiTags('Tasks')
 @Controller('task')
@@ -67,13 +71,31 @@ export class TaskController {
   }
 
   @Get()
-  findAll() {
-    return this.taskService.findAll();
+  @ApiOperation({
+    summary: FindAllTasksSwagger.summary,
+    description: FindAllTasksSwagger.description,
+  })
+  @ApiOkResponse(FindAllTasksSwagger.okResponse)
+  @ApiUnauthorizedResponse(FindAllTasksSwagger.unauthorizedResponse)
+  @ApiNotFoundResponse(FindAllTasksSwagger.notFoundResponse)
+  findAll(@CurrentUser() currentUser: CurrentUserDto) {
+    return this.taskService.findAll(currentUser.userId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.taskService.findOne(+id);
+  @Get(':taskId')
+  @ApiOperation({
+    summary: FindOneTaskSwagger.summary,
+    description: FindOneTaskSwagger.description,
+  })
+  @ApiParam(FindOneTaskSwagger.taskIdParam)
+  @ApiOkResponse(FindOneTaskSwagger.okResponse)
+  @ApiUnauthorizedResponse(FindOneTaskSwagger.unauthorizedResponse)
+  @ApiNotFoundResponse(FindOneTaskSwagger.notFoundResponse)
+  findOne(
+    @Param('taskId') taskId: string,
+    @CurrentUser() currentUser: CurrentUserDto,
+  ) {
+    return this.taskService.findOne(taskId, currentUser.userId);
   }
 
   @Patch(':id')

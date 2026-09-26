@@ -9,4 +9,12 @@ export class TaskRepository {
   async create(data: Prisma.TaskUncheckedCreateInput) {
     return await this.prismaService.task.create({ data });
   }
+
+  async findAllByUserId(userId: string) {
+    return await this.prismaService.task.findMany({ where: { userId } });
+  }
+
+  async findById(taskId: string) {
+    return await this.prismaService.task.findUnique({ where: { taskId } });
+  }
 }
