@@ -5,9 +5,9 @@ export class TaskForbiddenError extends HttpException {
 
   constructor(taskId: string) {
     super(
-      'You do not have permission to update this task.',
+      'You do not have permission to access this task.',
       HttpStatus.FORBIDDEN,
     );
-    this.logger.error(`Forbidden task update attempt: ${taskId}`);
+    this.logger.error(`Forbidden task access attempt: ${taskId}`);
   }
 }
