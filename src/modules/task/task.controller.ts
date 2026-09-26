@@ -17,6 +17,7 @@ import {
   ApiBody,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -34,6 +35,7 @@ import { CreateTaskSwagger } from './docs/create-task.swagger.js';
 import { FindAllTasksSwagger } from './docs/find-all-tasks.swagger.js';
 import { FindOneTaskSwagger } from './docs/find-one-task.swagger.js';
 import { UpdateTaskSwagger } from './docs/update-task.swagger.js';
+import { RemoveTaskSwagger } from './docs/remove-task.swagger.js';
 
 @ApiTags('Tasks')
 @Controller('task')
@@ -132,8 +134,23 @@ export class TaskController {
     return this.taskService.update(taskId, updateTaskDto, currentUser.userId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.taskService.remove(+id);
+  @Delete(':taskId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: RemoveTaskSwagger.summary,
+    description: RemoveTaskSwagger.description,
+  })
+  @ApiParam(RemoveTaskSwagger.taskIdParam)
+  @ApiNoContentResponse(RemoveTaskSwagger.noContentResponse)
+  @ApiUnauthorizedResponse(RemoveTaskSwagger.unauthorizedResponse)
+  @ApiForbiddenResponse(RemoveTaskSwagger.forbiddenResponse)
+  @ApiNotFoundResponse(RemoveTaskSwagger.notFoundResponse)
+  async remove(
+    @Param('taskId') taskId: string,
+    @CurrentUser() currentUser: CurrentUserDto,
+  ) {
+    this.logger.debug(`Remove task endpoint called ${taskId}`);
+
+    await this.taskService.remove(taskId, currentUser.userId);
   }
 }

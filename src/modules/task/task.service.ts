@@ -36,23 +36,13 @@ export class TaskService {
   }
 
   async findOne(taskId: string, userId: string) {
-    const [, task] = await Promise.all([
-      this.validateUserExists(userId),
-      this.getTaskByIdOrThrow(taskId),
-    ]);
-
-    if (task.userId !== userId) throw new TaskForbiddenError(taskId);
+    const task = await this.getOwnedTaskOrThrow(userId, taskId);
 
     return task;
   }
 
   async update(taskId: string, updateTaskDto: UpdateTaskDto, userId: string) {
-    const [, task] = await Promise.all([
-      this.validateUserExists(userId),
-      this.getTaskByIdOrThrow(taskId),
-    ]);
-
-    if (task.userId !== userId) throw new TaskForbiddenError(taskId);
+    const task = await this.getOwnedTaskOrThrow(userId, taskId);
 
     const data = this.getChangedData(updateTaskDto, task);
 
@@ -62,14 +52,33 @@ export class TaskService {
     return await this.taskRepository.update(taskId, data);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  async remove(taskId: string, userId: string) {
+    await this.getOwnedTaskOrThrow(userId, taskId);
+
+    await this.taskRepository.delete(taskId);
   }
 
   private async getTaskByIdOrThrow(taskId: string) {
     const task = await this.taskRepository.findById(taskId);
 
     if (!task) throw new TaskNotFoundError(taskId);
+
+    return task;
+  }
+
+  private async validateUserExists(userId: string) {
+    const userExists = await this.userRepository.findById(userId);
+
+    if (!userExists) throw new UserNotFoundError(userId);
+  }
+
+  private async getOwnedTaskOrThrow(userId: string, taskId: string) {
+    const [, task] = await Promise.all([
+      this.validateUserExists(userId),
+      this.getTaskByIdOrThrow(taskId),
+    ]);
+
+    if (task.userId !== userId) throw new TaskForbiddenError(taskId);
 
     return task;
   }
@@ -110,11 +119,5 @@ export class TaskService {
     }
 
     return data;
-  }
-
-  private async validateUserExists(userId: string) {
-    const userExists = await this.userRepository.findById(userId);
-
-    if (!userExists) throw new UserNotFoundError(userId);
   }
 }
