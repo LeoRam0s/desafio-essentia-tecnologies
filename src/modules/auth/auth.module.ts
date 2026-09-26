@@ -17,6 +17,6 @@ import { AuthGuard } from './guards/auth.guard.js';
     RedisService,
     AuthGuard,
   ],
-  exports: [AuthGuard],
+  exports: [AuthGuard, JwtModule],
 })
 export class AuthModule {}
