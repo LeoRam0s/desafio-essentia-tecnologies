@@ -97,6 +97,8 @@ export class TaskController {
     @Param('taskId') taskId: string,
     @CurrentUser() currentUser: CurrentUserDto,
   ) {
+    this.logger.debug(`Find one task endpoint called ${taskId}`);
+
     return this.taskService.findOne(taskId, currentUser.userId);
   }
 
