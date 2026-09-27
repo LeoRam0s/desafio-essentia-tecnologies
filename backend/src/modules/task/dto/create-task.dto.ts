@@ -6,8 +6,29 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  Validate,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
 } from 'class-validator';
 import { TaskPriority } from '../enums/task-priority.enum.js';
+
+@ValidatorConstraint({ name: 'notBeforeToday', async: false })
+class NotBeforeTodayConstraint implements ValidatorConstraintInterface {
+  validate(value: Date): boolean {
+    const dueDate = new Date(
+      value.getFullYear(),
+      value.getMonth(),
+      value.getDate(),
+    );
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return dueDate >= today;
+  }
+
+  defaultMessage(): string {
+    return 'dueDate must be today or a future date';
+  }
+}
 
 export class CreateTaskDto {
   @ApiProperty({
@@ -48,5 +69,6 @@ export class CreateTaskDto {
   @IsOptional()
   @Type(() => Date)
   @IsDate()
+  @Validate(NotBeforeTodayConstraint)
   dueDate?: Date | null;
 }
