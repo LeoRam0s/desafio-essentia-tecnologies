@@ -1,0 +1,82 @@
+<main class="auth-page">
+  <section class="auth-card" aria-labelledby="register-title">
+    <img
+      class="auth-logo"
+      src="/assets/logo-essentia.png"
+      alt="Essentia"
+      width="200"
+      height="200"
+    />
+
+    <header class="auth-header">
+      <h1 id="register-title">Crie sua conta</h1>
+      <p>Organize suas tarefas em um só lugar</p>
+    </header>
+
+    <form
+      class="auth-form"
+      [formGroup]="registerForm"
+      (ngSubmit)="onSubmit()"
+      [attr.aria-busy]="isLoading"
+      novalidate
+    >
+      <app-form-field
+        id="register-name"
+        label="Nome"
+        autocomplete="name"
+        formControlName="name"
+        [submitted]="hasSubmitted"
+        [errorMessages]="nameErrorMessages"
+      />
+
+      <app-form-field
+        id="register-email"
+        label="E-mail"
+        type="email"
+        autocomplete="email"
+        formControlName="email"
+        [submitted]="hasSubmitted"
+        [errorMessages]="emailErrorMessages"
+      />
+
+      <app-form-field
+        id="register-password"
+        label="Senha"
+        type="password"
+        autocomplete="new-password"
+        formControlName="password"
+        [submitted]="hasSubmitted"
+        [errorMessages]="passwordErrorMessages"
+      />
+
+      <app-form-field
+        id="register-confirm-password"
+        label="Confirmar senha"
+        type="password"
+        autocomplete="new-password"
+        formControlName="confirmPassword"
+        [submitted]="hasSubmitted"
+        [errorMessages]="confirmPasswordErrorMessages"
+        [externalError]="
+          registerForm.hasError('passwordMismatch')
+            ? passwordMismatchMessage
+            : null
+        "
+      />
+
+      @if (errorMessage) {
+        <p class="auth-message auth-message--error" role="alert">
+          {{ errorMessage }}
+        </p>
+      }
+
+      <button class="auth-submit" type="submit" [disabled]="isLoading">
+        {{ isLoading ? "Criando conta..." : "Criar conta" }}
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Já possui uma conta? <a routerLink="/login">Entrar</a>
+    </p>
+  </section>
+</main>
