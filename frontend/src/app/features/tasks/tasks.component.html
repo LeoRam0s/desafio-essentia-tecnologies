@@ -1,0 +1,57 @@
+<div class="tasks-page">
+  <div class="page-heading">
+    <h1>Minhas tarefas</h1>
+    <button class="primary-button" type="button" (click)="openCreate()">+ Nova tarefa</button>
+  </div>
+
+  @if (loadError) {
+    <div class="page-message" role="alert">
+      <span>{{ loadError }}</span>
+      <button type="button" (click)="loadTasks()">Tentar novamente</button>
+    </div>
+  }
+
+  @if (isLoading) {
+    <p class="loading-message" role="status">Carregando tarefas...</p>
+  }
+
+  <section class="board" aria-label="Quadro de tarefas">
+    @for (column of columns; track column.taskStatusId) {
+      <section class="board-column" [attr.aria-labelledby]="'column-' + column.taskStatusId">
+        <div class="board-column__heading">
+          <h2 [id]="'column-' + column.taskStatusId">{{ column.name }}</h2>
+          <span class="board-column__count" [attr.aria-label]="tasksByStatus[column.taskStatusId].length + (tasksByStatus[column.taskStatusId].length === 1 ? ' tarefa' : ' tarefas')">
+            {{ tasksByStatus[column.taskStatusId].length }}
+          </span>
+        </div>
+
+        <div class="board-column__cards">
+          @for (task of tasksByStatus[column.taskStatusId]; track task.taskId) {
+            <app-task-card
+              [task]="task"
+              [priorityLabel]="priorityName(task.taskPriorityId)"
+              [isOpening]="openingTaskId === task.taskId"
+              (edit)="openEdit($event)"
+            />
+          } @empty {
+            @if (!isLoading) {
+              <p class="empty-column">Nenhuma tarefa</p>
+            }
+          }
+        </div>
+      </section>
+    }
+  </section>
+
+  <app-task-modal
+    [task]="selectedTask"
+    [open]="isModalOpen"
+    [priorities]="priorities"
+    [statuses]="statuses"
+    [isSaving]="isSaving"
+    [error]="modalError"
+    (submit)="onSubmit($event)"
+    (closeRequested)="closeModal()"
+    (deleteRequested)="removeTask()"
+  />
+</div>
