@@ -15,8 +15,8 @@
     "db:up": "docker compose --env-file .env -f ../docker-compose.yaml up -d",
     "db:down": "docker-compose -f ../docker-compose.yaml down",
     "db:migrate": "prisma migrate dev --name init && prisma generate",
-    "db:test:up": "docker compose --env-file .env.test -f ../docker-compose.yaml up -d --wait --wait-timeout 120 mysql-test",
-    "db:test:down": "docker compose --env-file .env.test -f ../docker-compose.yaml rm --stop --force mysql-test",
+    "db:test:up": "npm run db:test:down && docker compose --env-file .env.test -f ../docker-compose.yaml up -d --wait --wait-timeout 120 mysql-test mongo-test",
+    "db:test:down": "docker compose --env-file .env.test -f ../docker-compose.yaml rm --stop --force --volumes mysql-test mongo-test",
     "db:test:migrate": "node --env-file=.env.test ./node_modules/prisma/build/index.js migrate deploy",
     "test:e2e": "trap 'npm run db:test:down' EXIT; npm run db:test:up && npm run db:test:migrate && node --env-file=.env.test ./node_modules/vitest/vitest.mjs --config vitest.config.e2e.ts --run",
     "test:unit": "node ./node_modules/vitest/vitest.mjs --config vitest.config.ts --run"
