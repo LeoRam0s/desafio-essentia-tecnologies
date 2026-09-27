@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Logger,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -12,6 +13,8 @@ import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiBearerAuth,
+  ApiNoContentResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -23,6 +26,9 @@ import { SignupDto } from './dto/signup.dto.js';
 import { RefreshTokenSwagger } from './docs/refresh-token.swagger.js';
 import { SigninLocalSwagger } from './docs/signin-local.swagger.js';
 import { SignupLocalSwagger } from './docs/signup-local.swagger.js';
+import { CurrentUser } from './decorators/current-user.decorator.js';
+import { CurrentUserDto } from './dto/current-user.dto.js';
+import { AuthGuard } from './guards/auth.guard.js';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -101,5 +107,20 @@ export class AuthController {
     this.logger.debug('Refresh token endpoint called');
 
     return await this.authService.refreshToken(body);
+  }
+
+  @Post('logout')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Log out the authenticated user',
+    description: 'Invalidates the authenticated user refresh token.',
+  })
+  @ApiNoContentResponse({ description: 'Refresh token invalidated.' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid access token.' })
+  async logout(@CurrentUser() currentUser: CurrentUserDto): Promise<void> {
+    this.logger.debug('Logout endpoint called');
+    await this.authService.logout(currentUser.userId);
   }
 }

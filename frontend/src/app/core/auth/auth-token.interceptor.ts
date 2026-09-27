@@ -17,7 +17,11 @@ import { AuthService } from './auth.service';
 import type { RefreshTokenResponse } from './auth.models';
 import { clearSession } from './session';
 
-const AUTH_API_PREFIX = 'api/auth/';
+const PUBLIC_AUTH_ENDPOINTS = new Set([
+  'api/auth/signin',
+  'api/auth/signup',
+  'api/auth/refresh-token',
+]);
 
 // Share one refresh request when several API calls expire at the same time.
 let refreshInFlight$: Observable<RefreshTokenResponse> | null = null;
@@ -50,8 +54,8 @@ function refreshSession(
 export const authTokenInterceptor: HttpInterceptorFn = (request, next) => {
   const path = request.url.replace(/^\//, '');
 
-  // Auth endpoints must bypass this interceptor to prevent refresh recursion.
-  if (path.startsWith(AUTH_API_PREFIX)) {
+  // Only public auth calls bypass the token; logout remains authenticated.
+  if (PUBLIC_AUTH_ENDPOINTS.has(path)) {
     return next(request);
   }
 

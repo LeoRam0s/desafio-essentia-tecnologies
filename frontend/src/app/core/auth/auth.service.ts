@@ -32,4 +32,8 @@ export class AuthService {
       payload,
     );
   }
+
+  logout(): Observable<void> {
+    return this.http.post<void>(`${this.authUrl}/logout`, null);
+  }
 }
