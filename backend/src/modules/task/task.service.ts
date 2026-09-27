@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
-import { TaskRepository } from './task.repository.js';
+import { TaskRepository } from './repositories/task.repository.js';
+import { TaskHistoryRepository } from './repositories/task-history.repository.js';
 import { UserRepository } from '../user/user.repository.js';
 import { UserNotFoundError } from '../user/errors/user-not-found.error.js';
 import { TaskStatus } from './enums/task-status.enum.js';
@@ -15,6 +16,7 @@ export class TaskService {
   constructor(
     private readonly taskRepository: TaskRepository,
     private readonly userRepository: UserRepository,
+    private readonly taskHistoryRepository: TaskHistoryRepository,
   ) {}
 
   async create(createTaskDto: CreateTaskDto, userId: string) {
@@ -27,7 +29,13 @@ export class TaskService {
       completedAt: null,
     };
 
-    return await this.taskRepository.create(taskToCreate);
+    const createdTask = await this.taskRepository.create(taskToCreate);
+    await this.taskHistoryRepository.create(
+      createdTask.taskId,
+      TaskStatus[createdTask.taskStatusId] as keyof typeof TaskStatus,
+    );
+
+    return createdTask;
   }
 
   async findAll(userId: string) {
@@ -50,13 +58,23 @@ export class TaskService {
     if (Object.keys(data).length === 0)
       throw new NoChangesToUpdateError(taskId);
 
-    return await this.taskRepository.update(taskId, data);
+    const updatedTask = await this.taskRepository.update(taskId, data);
+
+    if (data.taskStatusId !== undefined) {
+      await this.taskHistoryRepository.addStatus(
+        taskId,
+        TaskStatus[Number(data.taskStatusId)] as keyof typeof TaskStatus,
+      );
+    }
+
+    return updatedTask;
   }
 
   async remove(taskId: string, userId: string) {
     await this.getOwnedTaskOrThrow(userId, taskId);
 
     await this.taskRepository.delete(taskId);
+    await this.taskHistoryRepository.deleteByTaskId(taskId);
   }
 
   async getTaskPriorities() {
