@@ -6,7 +6,20 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { Task, TaskPriority, TaskPriorityId, TaskStatus, TaskStatusId } from '../../task.models';
+import {
+  TaskDetails,
+  TaskHistoryStatus,
+  TaskPriority,
+  TaskPriorityId,
+  TaskStatus,
+  TaskStatusId,
+} from '../../task.models';
+
+const HISTORY_STATUS_IDS: Record<TaskHistoryStatus, TaskStatusId> = {
+  TO_DO: 1,
+  DOING: 2,
+  COMPLETED: 3,
+};
 
 function localDateString(date: Date): string {
   const year = date.getFullYear();
@@ -39,7 +52,7 @@ export interface TaskFormValues {
 export class TaskModalComponent implements OnChanges, AfterViewInit {
   @ViewChild('taskDialog', { static: true }) private taskDialog!: ElementRef<HTMLDialogElement>;
 
-  @Input() task: Task | null = null;
+  @Input() task: TaskDetails | null = null;
   @Input() open = false;
   @Input({ required: true }) priorities: TaskPriority[] = [];
   @Input({ required: true }) statuses: TaskStatus[] = [];
@@ -55,6 +68,24 @@ export class TaskModalComponent implements OnChanges, AfterViewInit {
 
   protected get todayDate(): string {
     return localDateString(new Date());
+  }
+
+  protected historyStatusName(status: TaskHistoryStatus): string {
+    return this.statuses.find((item) => item.taskStatusId === HISTORY_STATUS_IDS[status])
+      ?.name ?? status;
+  }
+
+  protected historyDateTime(changedAt: string): string {
+    const date = new Date(changedAt);
+    const formattedDate = new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return `${formattedDate} ${hours}:${minutes}`;
   }
 
   protected readonly taskForm = this.formBuilder.nonNullable.group({

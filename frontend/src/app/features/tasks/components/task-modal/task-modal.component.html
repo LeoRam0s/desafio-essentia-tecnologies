@@ -42,6 +42,18 @@
           <option [ngValue]="status.taskStatusId">{{ status.name }}</option>
         }
       </select>
+      @if (task.history.length) {
+        <p class="task-form__history" aria-label="Histórico de status">
+          @for (event of task.history; track $index) {
+            <span>{{ historyStatusName(event.status) }} ({{ historyDateTime(event.changedAt) }})</span>
+            @if (!$last) {
+              <svg class="task-form__history-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="seguido por">
+                <path d="M4 12h16m-6-6 6 6-6 6" />
+              </svg>
+            }
+          }
+        </p>
+      }
     }
 
     @if (error) {

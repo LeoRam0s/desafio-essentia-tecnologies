@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import {
   CreateTaskPayload,
   Task,
+  TaskDetails,
   TaskPriority,
   TaskStatus,
   UpdateTaskPayload,
@@ -22,8 +23,8 @@ export class TaskService {
     return this.http.get<Task[]>(this.url);
   }
 
-  findOne(taskId: string): Observable<Task> {
-    return this.http.get<Task>(`${this.url}/${encodeURIComponent(taskId)}`);
+  findOne(taskId: string): Observable<TaskDetails> {
+    return this.http.get<TaskDetails>(`${this.url}/${encodeURIComponent(taskId)}`);
   }
 
   update(taskId: string, payload: UpdateTaskPayload): Observable<Task> {

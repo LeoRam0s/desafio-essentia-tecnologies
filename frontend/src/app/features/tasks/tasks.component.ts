@@ -3,6 +3,7 @@ import { finalize } from 'rxjs';
 import {
   CreateTaskPayload,
   Task,
+  TaskDetails,
   TaskPriority,
   TaskPriorityId,
   TaskStatus,
@@ -80,7 +81,7 @@ export class TasksComponent implements OnInit {
   protected openingTaskId: string | null = null;
   protected loadError: string | null = null;
   protected modalError: string | null = null;
-  protected selectedTask: Task | null = null;
+  protected selectedTask: TaskDetails | null = null;
   protected isModalOpen = false;
 
   ngOnInit(): void {

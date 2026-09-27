@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model } from 'mongoose';
 import { TaskStatus } from '../enums/task-status.enum.js';
-import { TaskHistory } from '../schemas/task-history.schema.js';
+import {
+  TaskHistory,
+  TaskStatusHistory,
+} from '../schemas/task-history.schema.js';
 
 @Injectable()
 export class TaskHistoryRepository {
@@ -23,6 +26,14 @@ export class TaskHistoryRepository {
       { taskId },
       { $push: { history: { status, changedAt: new Date() } } },
     );
+  }
+
+  async findHistoryByTaskId(taskId: string): Promise<TaskStatusHistory[]> {
+    const document = await this.taskHistoryModel
+      .findOne({ taskId }, { history: 1, _id: 0 })
+      .lean();
+
+    return document?.history ?? [];
   }
 
   async deleteByTaskId(taskId: string) {

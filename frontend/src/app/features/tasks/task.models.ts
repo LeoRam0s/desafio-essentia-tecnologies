@@ -14,6 +14,17 @@ export interface Task {
   updatedAt: string;
 }
 
+export type TaskHistoryStatus = 'TO_DO' | 'DOING' | 'COMPLETED';
+
+export interface TaskHistoryEvent {
+  status: TaskHistoryStatus;
+  changedAt: string;
+}
+
+export interface TaskDetails extends Task {
+  history: TaskHistoryEvent[];
+}
+
 export interface TaskPriority {
   taskPriorityId: TaskPriorityId;
   name: string;

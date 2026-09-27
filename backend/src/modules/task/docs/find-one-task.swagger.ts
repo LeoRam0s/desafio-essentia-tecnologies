@@ -3,7 +3,7 @@ import { ApiResponseOptions } from '@nestjs/swagger';
 export const FindOneTaskSwagger = {
   summary: 'Get a task by ID',
   description:
-    'Returns a task by its identifier after validating the authenticated user.',
+    'Returns a task and its status history after validating the authenticated user. History is an empty array when no record exists.',
   taskIdParam: {
     name: 'taskId',
     description: 'Task unique identifier.',
@@ -23,6 +23,7 @@ export const FindOneTaskSwagger = {
         completedAt: null,
         createdAt: '2026-09-25T12:00:00.000Z',
         updatedAt: '2026-09-25T12:00:00.000Z',
+        history: [{ status: 'TO_DO', changedAt: '2026-09-25T12:00:00.000Z' }],
       },
     },
   } satisfies ApiResponseOptions,

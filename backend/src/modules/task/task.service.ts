@@ -46,8 +46,10 @@ export class TaskService {
 
   async findOne(taskId: string, userId: string) {
     const task = await this.getOwnedTaskOrThrow(userId, taskId);
+    const history =
+      await this.taskHistoryRepository.findHistoryByTaskId(taskId);
 
-    return task;
+    return { ...task, history };
   }
 
   async update(taskId: string, updateTaskDto: UpdateTaskDto, userId: string) {
