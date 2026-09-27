@@ -24,6 +24,7 @@ export class TaskService {
       ...createTaskDto,
       userId,
       taskStatusId: TaskStatus.TO_DO,
+      completedAt: null,
     };
 
     return await this.taskRepository.create(taskToCreate);
@@ -120,10 +121,12 @@ export class TaskService {
     }
 
     if (
-      dto.completedAt !== undefined &&
-      dto.completedAt?.getTime() !== task.completedAt?.getTime()
+      dto.taskStatusId !== undefined &&
+      Number(dto.taskStatusId) !== task.taskStatusId
     ) {
-      data.completedAt = dto.completedAt;
+      data.taskStatusId = dto.taskStatusId;
+      data.completedAt =
+        dto.taskStatusId === TaskStatus.COMPLETED ? new Date() : null;
     }
 
     return data;

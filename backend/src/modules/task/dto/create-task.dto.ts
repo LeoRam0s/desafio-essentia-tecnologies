@@ -49,17 +49,4 @@ export class CreateTaskDto {
   @Type(() => Date)
   @IsDate()
   dueDate?: Date | null;
-
-  @ApiPropertyOptional({
-    description:
-      'Optional task completion date. It is stored as provided and is not set automatically.',
-    example: '2026-10-01T12:00:00.000Z',
-    format: 'date-time',
-    type: String,
-    nullable: true,
-  })
-  @IsOptional()
-  @Type(() => Date)
-  @IsDate()
-  completedAt?: Date | null;
 }

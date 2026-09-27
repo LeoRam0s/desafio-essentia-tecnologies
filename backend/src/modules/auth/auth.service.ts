@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcrypt';
-import { randomUUID } from 'node:crypto';
 import { EnvironmentVariables } from '../../config/env.validation.js';
 import { RedisService } from '../../infra/redis/redis.service.js';
 import { UserRepository } from '../user/user.repository.js';

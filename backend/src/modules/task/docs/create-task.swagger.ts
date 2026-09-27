@@ -3,13 +3,12 @@ import { ApiResponseOptions } from '@nestjs/swagger';
 export const CreateTaskSwagger = {
   summary: 'Create a task',
   description:
-    'Creates a task for the authenticated user. The task starts with the TO_DO status.',
+    'Creates a task for the authenticated user. The task starts with the TO_DO status and no completion date.',
   bodyExample: {
     title: 'Finish project documentation',
     description: 'Document the authentication flow.',
     taskPriorityId: 2,
     dueDate: '2026-10-01T12:00:00.000Z',
-    completedAt: null,
   },
   createdResponse: {
     description: 'Task created successfully.',
