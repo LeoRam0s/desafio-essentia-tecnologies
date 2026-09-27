@@ -25,6 +25,36 @@ const DEFAULT_STATUSES: TaskStatus[] = [
   { taskStatusId: 3, name: 'Completed', description: '' },
 ];
 
+type TaskSortField = 'priority' | 'dueDate' | 'completedAt';
+type SortDirection = 'asc' | 'desc';
+
+interface ColumnSort {
+  field: TaskSortField;
+  direction: SortDirection;
+}
+
+interface SortOption {
+  field: TaskSortField;
+  label: string;
+}
+
+// Cada coluna de status tem suas próprias opções de ordenação.
+const SORT_OPTIONS: Record<TaskStatusId, SortOption[]> = {
+  1: [
+    { field: 'priority', label: 'Prioridade' },
+    { field: 'dueDate', label: 'Data de vencimento' },
+  ],
+  2: [
+    { field: 'priority', label: 'Prioridade' },
+    { field: 'dueDate', label: 'Data de vencimento' },
+  ],
+  3: [
+    { field: 'priority', label: 'Prioridade' },
+    { field: 'dueDate', label: 'Data de vencimento' },
+    { field: 'completedAt', label: 'Data de conclusão' },
+  ],
+};
+
 @Component({
   selector: 'app-tasks',
   imports: [TaskCardComponent, TaskModalComponent],
@@ -35,6 +65,13 @@ export class TasksComponent implements OnInit {
   private readonly taskService = inject(TaskService);
 
   protected readonly columns = DEFAULT_STATUSES;
+  protected readonly sortOptionsByStatus = SORT_OPTIONS;
+  // Cada coluna mantém seu próprio critério e direção de ordenação.
+  protected sortByStatus: Record<TaskStatusId, ColumnSort> = {
+    1: { field: 'priority', direction: 'asc' },
+    2: { field: 'priority', direction: 'asc' },
+    3: { field: 'priority', direction: 'asc' },
+  };
   protected priorities = DEFAULT_PRIORITIES;
   protected statuses = DEFAULT_STATUSES;
   protected tasksByStatus: Record<TaskStatusId, Task[]> = { 1: [], 2: [], 3: [] };
@@ -182,6 +219,57 @@ export class TasksComponent implements OnInit {
 
   protected priorityName(id: TaskPriorityId): string {
     return DEFAULT_PRIORITIES.find((priority) => priority.taskPriorityId === id)?.name ?? '';
+  }
+
+  protected changeSortField(taskStatusId: TaskStatusId, event: Event): void {
+    const field = (event.target as HTMLSelectElement).value as TaskSortField;
+    // Garante que a coluna só use campos oferecidos nas opções daquela coluna.
+    if (!this.sortOptionsByStatus[taskStatusId].some((option) => option.field === field)) {
+      return;
+    }
+
+    this.sortByStatus = {
+      ...this.sortByStatus,
+      [taskStatusId]: { ...this.sortByStatus[taskStatusId], field },
+    };
+  }
+
+  protected toggleSortDirection(taskStatusId: TaskStatusId): void {
+    const current = this.sortByStatus[taskStatusId];
+    this.sortByStatus = {
+      ...this.sortByStatus,
+      [taskStatusId]: {
+        ...current,
+        direction: current.direction === 'asc' ? 'desc' : 'asc',
+      },
+    };
+  }
+
+  protected sortedTasks(taskStatusId: TaskStatusId): Task[] {
+    const { field, direction } = this.sortByStatus[taskStatusId];
+
+    // Ordena uma cópia para preservar a lista agrupada usada como fonte.
+    return [...this.tasksByStatus[taskStatusId]].sort((a, b) => {
+      const aValue = this.sortValue(a, field);
+      const bValue = this.sortValue(b, field);
+
+      // Valores ausentes ficam no fim, independentemente da direção.
+      if (aValue === null) return bValue === null ? 0 : 1;
+      if (bValue === null) return -1;
+
+      const comparison = aValue - bValue;
+      return direction === 'asc' ? comparison : -comparison;
+    });
+  }
+
+  private sortValue(task: Task, field: TaskSortField): number | null {
+    if (field === 'priority') return task.taskPriorityId;
+
+    const date = field === 'dueDate' ? task.dueDate : task.completedAt;
+    if (!date) return null;
+
+    const timestamp = Date.parse(date);
+    return Number.isNaN(timestamp) ? null : timestamp;
   }
 
   private save(request: ReturnType<TaskService['create']>): void {

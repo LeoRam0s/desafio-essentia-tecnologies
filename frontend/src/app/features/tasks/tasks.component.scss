@@ -74,7 +74,8 @@ button:focus-visible {
 .board-column__heading {
   align-items: center;
   display: flex;
-  gap: 0.6rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.6rem;
   margin-bottom: 1.25rem;
 }
 
@@ -96,6 +97,49 @@ button:focus-visible {
   justify-content: center;
   min-width: 1.4rem;
   padding: 0 0.3rem;
+}
+
+.board-column__sort {
+  align-items: center;
+  display: flex;
+  gap: 0.35rem;
+  margin-left: auto;
+  min-width: 0;
+}
+
+.board-column__sort-select {
+  background: var(--color-input);
+  border: 1px solid var(--color-border);
+  border-radius: 0.4rem;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.75rem;
+  min-height: 2.5rem;
+  max-width: 10rem;
+  min-width: 0;
+  padding: 0.35rem 1.7rem 0.35rem 0.55rem;
+}
+
+.board-column__sort-select:focus-visible {
+  @include controls.focus-visible;
+}
+
+.board-column__sort-direction {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 0.4rem;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  flex: 0 0 2.5rem;
+  height: 2.5rem;
+  justify-content: center;
+  padding: 0;
+}
+
+.board-column__sort-direction:hover {
+  background: var(--color-input);
+  color: var(--color-text-primary);
 }
 
 .board-column__cards {

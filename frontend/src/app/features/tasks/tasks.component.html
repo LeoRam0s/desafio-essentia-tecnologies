@@ -23,10 +23,39 @@
           <span class="board-column__count" [attr.aria-label]="tasksByStatus[column.taskStatusId].length + (tasksByStatus[column.taskStatusId].length === 1 ? ' tarefa' : ' tarefas')">
             {{ tasksByStatus[column.taskStatusId].length }}
           </span>
+          <div class="board-column__sort">
+            <select
+              class="board-column__sort-select"
+              [value]="sortByStatus[column.taskStatusId].field"
+              [attr.aria-label]="'Critério de ordenação da coluna ' + column.name"
+              (change)="changeSortField(column.taskStatusId, $event)"
+            >
+              @for (option of sortOptionsByStatus[column.taskStatusId]; track option.field) {
+                <option [value]="option.field">{{ option.label }}</option>
+              }
+            </select>
+            <button
+              class="board-column__sort-direction"
+              type="button"
+              [attr.aria-label]="'Ordenação ' + (sortByStatus[column.taskStatusId].direction === 'asc' ? 'crescente' : 'decrescente') + ' para ' + column.name"
+              [attr.aria-pressed]="sortByStatus[column.taskStatusId].direction === 'desc'"
+              (click)="toggleSortDirection(column.taskStatusId)"
+            >
+              @if (sortByStatus[column.taskStatusId].direction === 'asc') {
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 19V5m-6 6 6-6 6 6" />
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 5v14m-6-6 6 6 6-6" />
+                </svg>
+              }
+            </button>
+          </div>
         </div>
 
         <div class="board-column__cards">
-          @for (task of tasksByStatus[column.taskStatusId]; track task.taskId) {
+          @for (task of sortedTasks(column.taskStatusId); track task.taskId) {
             <app-task-card
               [task]="task"
               [priorityLabel]="priorityName(task.taskPriorityId)"
