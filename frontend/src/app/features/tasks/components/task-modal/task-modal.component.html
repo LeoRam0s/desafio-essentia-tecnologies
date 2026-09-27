@@ -1,0 +1,64 @@
+<dialog #taskDialog class="task-dialog" aria-labelledby="task-dialog-title" (cancel)="onDialogCancel($event)">
+  <form class="task-form" [formGroup]="taskForm" (ngSubmit)="onSubmit($event)" novalidate>
+    <div class="task-dialog__heading">
+      <h2 id="task-dialog-title">{{ task ? 'Editar tarefa' : 'Nova tarefa' }}</h2>
+      <button class="icon-button" type="button" aria-label="Fechar formulário" [disabled]="isSaving" (click)="closeRequested.emit()">×</button>
+    </div>
+
+    <label for="task-title">Título</label>
+    <input id="task-title" type="text" formControlName="title" maxlength="100" />
+    @if (taskForm.controls.title.touched && taskForm.controls.title.invalid) {
+      <p class="field-error">Informe um título de até 100 caracteres.</p>
+    }
+
+    <label for="task-description">Descrição</label>
+    <textarea id="task-description" formControlName="description" maxlength="500" rows="3"></textarea>
+    @if (taskForm.controls.description.touched && taskForm.controls.description.invalid) {
+      <p class="field-error">A descrição deve ter no máximo 500 caracteres.</p>
+    }
+
+    <div class="task-form__row">
+      <div class="task-form__field">
+        <label for="task-priority">Prioridade</label>
+        <select id="task-priority" formControlName="taskPriorityId">
+          @for (priority of priorities; track priority.taskPriorityId) {
+            <option [ngValue]="priority.taskPriorityId">{{ priority.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="task-form__field">
+        <label for="task-due-date">Entrega</label>
+        <input id="task-due-date" type="date" formControlName="dueDate" [min]="todayDate" />
+        @if (taskForm.controls.dueDate.touched && taskForm.controls.dueDate.hasError('dateInPast')) {
+          <p class="field-error">A entrega deve ser hoje ou uma data futura.</p>
+        }
+      </div>
+    </div>
+
+    @if (task) {
+      <label for="task-status">Status</label>
+      <select id="task-status" formControlName="taskStatusId">
+        @for (status of statuses; track status.taskStatusId) {
+          <option [ngValue]="status.taskStatusId">{{ status.name }}</option>
+        }
+      </select>
+    }
+
+    @if (error) {
+      <p class="form-message" role="alert">{{ error }}</p>
+    }
+
+    <div class="task-form__actions">
+      @if (task && isConfirmingDelete) {
+        <button class="secondary-button" type="button" [disabled]="isSaving" (click)="cancelDelete()">Cancelar</button>
+        <button class="delete-button delete-button--confirm" type="button" [disabled]="isSaving" (click)="deleteRequested.emit()">{{ isSaving ? 'Removendo...' : 'Confirmar remoção' }}</button>
+      } @else {
+        @if (task) {
+          <button class="delete-button" type="button" [disabled]="isSaving" (click)="isConfirmingDelete = true">Remover</button>
+        }
+        <button class="secondary-button" type="button" [disabled]="isSaving" (click)="closeRequested.emit()">Cancelar</button>
+        <button class="primary-button" type="submit" [disabled]="isSaving">{{ isSaving ? 'Salvando...' : 'Salvar tarefa' }}</button>
+      }
+    </div>
+  </form>
+</dialog>
