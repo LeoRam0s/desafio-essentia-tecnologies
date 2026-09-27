@@ -1,0 +1,127 @@
+@use '../../_task-controls' as controls;
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.task-card {
+  background: var(--color-input);
+  border: 1px solid var(--color-border);
+  border-radius: 0.625rem;
+  color: var(--color-text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 1rem;
+  width: 100%;
+}
+
+.task-card:hover {
+  border-color: var(--color-border-hover);
+}
+
+.task-card__edit,
+.task-card__description-toggle {
+  @include controls.button;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.task-card__edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.task-card__edit:disabled,
+.task-card__description-toggle:disabled {
+  @include controls.disabled;
+}
+
+.task-card__edit:focus-visible,
+.task-card__description-toggle:focus-visible {
+  @include controls.focus-visible;
+}
+
+.task-card__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.priority {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
+.priority[data-priority='1'] {
+  color: var(--color-success);
+}
+
+.priority[data-priority='2'] {
+  color: var(--color-warning);
+}
+
+.priority[data-priority='3'] {
+  color: var(--color-danger);
+}
+
+.task-card__date {
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.task-card__metadata {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+}
+
+.task-card__dates {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+}
+
+.task-card__date {
+  white-space: nowrap;
+}
+
+.task-card__date--completed {
+  color: var(--color-success);
+}
+
+.task-card__description {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.task-card__footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.task-card__description-toggle {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.task-card__description-toggle:hover:not(:disabled) {
+  color: var(--color-text-primary);
+}

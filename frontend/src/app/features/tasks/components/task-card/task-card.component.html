@@ -1,0 +1,44 @@
+<article class="task-card">
+  <button
+    class="task-card__edit"
+    type="button"
+    [disabled]="isOpening"
+    [attr.aria-label]="'Editar tarefa ' + task.title"
+    (click)="edit.emit(task.taskId)"
+  >
+    <span class="task-card__title">{{ task.title }}</span>
+    <div class="task-card__metadata">
+      <span class="priority" [attr.data-priority]="task.taskPriorityId" role="img" [attr.aria-label]="'Prioridade ' + priorityLabel">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 21V4m0 1c3-2 5 2 8 0s5-1 6 0v10c-3-1-4-2-6 0s-5-2-8 0" />
+        </svg>
+      </span>
+      @if (task.dueDate || task.completedAt) {
+        <div class="task-card__dates">
+          @if (task.dueDate) {
+            <span class="task-card__date task-card__date--due">Entrega · {{ formatDate(task.dueDate, true) }}</span>
+          }
+          @if (task.completedAt) {
+            <span class="task-card__date task-card__date--completed">Concluída · {{ formatDate(task.completedAt) }}</span>
+          }
+        </div>
+      }
+    </div>
+  </button>
+
+  @if (hasDescription) {
+    <p class="task-card__description" [id]="'task-description-' + task.taskId" [hidden]="!isDescriptionVisible">
+      {{ task.description }}
+    </p>
+    <div class="task-card__footer">
+      <button
+        class="task-card__description-toggle"
+        type="button"
+        [disabled]="isOpening"
+        [attr.aria-expanded]="isDescriptionVisible"
+        [attr.aria-controls]="'task-description-' + task.taskId"
+        (click)="toggleDescription()"
+      >{{ isDescriptionVisible ? 'Esconder descrição' : 'Mostrar descrição' }}</button>
+    </div>
+  }
+</article>
