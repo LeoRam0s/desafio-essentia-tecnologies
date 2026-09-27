@@ -48,3 +48,23 @@ services:
     restart: always
     ports:
       - '${REDIS_PORT}:6379'
+  mongo:
+    image: mongo:8.0
+    container_name: mongo_essential_tech
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
+    ports:
+      - '27017:27017'
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          mongosh --quiet --username "$$MONGO_INITDB_ROOT_USERNAME"
+          --password "$$MONGO_INITDB_ROOT_PASSWORD"
+          --authenticationDatabase admin --eval 'db.adminCommand("ping").ok'
+      interval: 5s
+      timeout: 5s
+      retries: 10
