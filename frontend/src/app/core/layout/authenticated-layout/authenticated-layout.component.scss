@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.authenticated-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.authenticated-layout__content {
+  flex: 1;
+  margin: 0 auto;
+  max-width: 82rem;
+  padding: 2.5rem 2rem 4rem;
+  width: 100%;
+}
+
+@media (max-width: 34rem) {
+  .authenticated-layout__content {
+    padding: 2rem 1rem 3rem;
+  }
+}

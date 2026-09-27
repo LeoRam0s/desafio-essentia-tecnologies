@@ -1,0 +1,81 @@
+:host {
+  display: block;
+}
+
+.site-header {
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+  width: 100%;
+}
+
+.site-header__inner {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 82rem;
+  min-height: 5rem;
+  padding: 0.5rem 2rem;
+}
+
+.site-header img {
+  display: block;
+  height: 3.5rem;
+  object-fit: contain;
+  width: 3.5rem;
+}
+
+.site-header__account {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  margin-left: auto;
+  min-width: 0;
+}
+
+.site-header__user {
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-left: 1rem;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.logout-button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font: inherit;
+  height: 2.75rem;
+  justify-content: center;
+  padding: 0;
+  width: 2.75rem;
+}
+
+.logout-button:hover:not(:disabled) {
+  background: var(--color-surface);
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}
+
+.logout-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.logout-button:focus-visible {
+  outline: 2px solid var(--color-text-primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 34rem) {
+  .site-header__inner {
+    padding: 0.5rem 1rem;
+  }
+}
