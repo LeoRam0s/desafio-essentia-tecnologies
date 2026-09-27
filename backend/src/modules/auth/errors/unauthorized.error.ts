@@ -4,7 +4,7 @@ export class UnauthorizedError extends UnauthorizedException {
   private readonly logger = new Logger(UnauthorizedError.name);
 
   constructor(token?: string) {
-    super();
+    super('Invalid token.');
     this.logger.error(
       token
         ? `Unauthorized access. Invalid Token: ${token}`

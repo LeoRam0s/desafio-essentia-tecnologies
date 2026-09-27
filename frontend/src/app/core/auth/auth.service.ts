@@ -14,7 +14,7 @@ import {
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly authUrl = 'api/auth';
+  private readonly authUrl = '/api/auth';
 
   constructor(private readonly http: HttpClient) {}
 
