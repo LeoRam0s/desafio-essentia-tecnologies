@@ -24,6 +24,22 @@ export class EnvironmentVariables {
 
   @IsNotEmpty()
   @IsString()
+  MONGO_INITDB_ROOT_USERNAME: string;
+
+  @IsNotEmpty()
+  @IsString()
+  MONGO_INITDB_ROOT_PASSWORD: string;
+
+  @IsNotEmpty()
+  @IsString()
+  MONGODB_DATABASE: string;
+
+  @IsNotEmpty()
+  @IsString()
+  MONGODB_URL: string;
+
+  @IsNotEmpty()
+  @IsString()
   DB_HOST: string;
 
   @IsNotEmpty()
