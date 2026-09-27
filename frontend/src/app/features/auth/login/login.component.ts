@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 import { SigninResponse } from '../../../core/auth/auth.models';
@@ -19,6 +19,7 @@ import {
 export class LoginComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   protected readonly loginForm = this.formBuilder.nonNullable.group({
     email: [
@@ -34,7 +35,6 @@ export class LoginComponent {
   protected hasSubmitted = false;
   protected isLoading = false;
   protected errorMessage: string | null = null;
-  protected successMessage: string | null = null;
 
   protected readonly emailErrorMessages: FormFieldErrorMessages = {
     required: 'Informe seu e-mail.',
@@ -55,7 +55,6 @@ export class LoginComponent {
 
     this.hasSubmitted = true;
     this.errorMessage = null;
-    this.successMessage = null;
 
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -70,7 +69,7 @@ export class LoginComponent {
       .subscribe({
         next: (response) => {
           this.storeSession(response);
-          this.successMessage = 'Login realizado com sucesso.';
+          void this.router.navigate(['/tasks']);
         },
         error: (error: HttpErrorResponse) => {
           this.errorMessage =

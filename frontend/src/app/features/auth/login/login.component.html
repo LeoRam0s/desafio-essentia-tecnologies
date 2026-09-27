@@ -46,12 +46,6 @@
         </p>
       }
 
-      @if (successMessage) {
-        <p class="auth-message auth-message--success" role="status">
-          {{ successMessage }}
-        </p>
-      }
-
       <button class="auth-submit" type="submit" [disabled]="isLoading">
         {{ isLoading ? "Entrando..." : "Entrar" }}
       </button>
