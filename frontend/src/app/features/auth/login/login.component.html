@@ -1,0 +1,64 @@
+<main class="auth-page">
+  <section class="auth-card" aria-labelledby="login-title">
+    <img
+      class="auth-logo"
+      src="/assets/logo-essentia.png"
+      alt="Essentia"
+      width="200"
+      height="200"
+    />
+
+    <header class="auth-header">
+      <h1 id="login-title">Bem-vindo</h1>
+      <p>Entre para acessar suas tarefas</p>
+    </header>
+
+    <form
+      class="auth-form"
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+      [attr.aria-busy]="isLoading"
+      novalidate
+    >
+      <app-form-field
+        id="login-email"
+        label="E-mail"
+        type="email"
+        autocomplete="email"
+        formControlName="email"
+        [submitted]="hasSubmitted"
+        [errorMessages]="emailErrorMessages"
+      />
+
+      <app-form-field
+        id="login-password"
+        label="Senha"
+        type="password"
+        autocomplete="current-password"
+        formControlName="password"
+        [submitted]="hasSubmitted"
+        [errorMessages]="passwordErrorMessages"
+      />
+
+      @if (errorMessage) {
+        <p class="auth-message auth-message--error" role="alert">
+          {{ errorMessage }}
+        </p>
+      }
+
+      @if (successMessage) {
+        <p class="auth-message auth-message--success" role="status">
+          {{ successMessage }}
+        </p>
+      }
+
+      <button class="auth-submit" type="submit" [disabled]="isLoading">
+        {{ isLoading ? "Entrando..." : "Entrar" }}
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Não possui uma conta? <a routerLink="/register">Cadastre-se</a>
+    </p>
+  </section>
+</main>
