@@ -28,4 +28,12 @@ export class TaskRepository {
   async delete(taskId: string) {
     return await this.prismaService.task.delete({ where: { taskId } });
   }
+
+  async getTaskPriorities() {
+    return await this.prismaService.taskPriority.findMany();
+  }
+
+  async getTaskStatus() {
+    return await this.prismaService.taskStatus.findMany();
+  }
 }

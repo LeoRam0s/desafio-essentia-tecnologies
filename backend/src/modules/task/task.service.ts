@@ -58,6 +58,14 @@ export class TaskService {
     await this.taskRepository.delete(taskId);
   }
 
+  async getTaskPriorities() {
+    return await this.taskRepository.getTaskPriorities();
+  }
+
+  async getTaskStatus() {
+    return await this.taskRepository.getTaskStatus();
+  }
+
   private async getTaskByIdOrThrow(taskId: string) {
     const task = await this.taskRepository.findById(taskId);
 

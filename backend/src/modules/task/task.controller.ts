@@ -34,6 +34,8 @@ import { UpdateTaskDto } from './dto/update-task.dto.js';
 import { CreateTaskSwagger } from './docs/create-task.swagger.js';
 import { FindAllTasksSwagger } from './docs/find-all-tasks.swagger.js';
 import { FindOneTaskSwagger } from './docs/find-one-task.swagger.js';
+import { GetTaskPrioritiesSwagger } from './docs/get-task-priorities.swagger.js';
+import { GetTaskStatusSwagger } from './docs/get-task-status.swagger.js';
 import { UpdateTaskSwagger } from './docs/update-task.swagger.js';
 import { RemoveTaskSwagger } from './docs/remove-task.swagger.js';
 
@@ -45,6 +47,32 @@ export class TaskController {
   private readonly logger = new Logger(TaskController.name);
 
   constructor(private readonly taskService: TaskService) {}
+
+  @Get('status')
+  @ApiOperation({
+    summary: GetTaskStatusSwagger.summary,
+    description: GetTaskStatusSwagger.description,
+  })
+  @ApiOkResponse(GetTaskStatusSwagger.okResponse)
+  @ApiUnauthorizedResponse(GetTaskStatusSwagger.unauthorizedResponse)
+  async getTaskStatus() {
+    this.logger.debug('Get task status endpoint called');
+
+    return await this.taskService.getTaskStatus();
+  }
+
+  @Get('priorities')
+  @ApiOperation({
+    summary: GetTaskPrioritiesSwagger.summary,
+    description: GetTaskPrioritiesSwagger.description,
+  })
+  @ApiOkResponse(GetTaskPrioritiesSwagger.okResponse)
+  @ApiUnauthorizedResponse(GetTaskPrioritiesSwagger.unauthorizedResponse)
+  async getTaskPriorities() {
+    this.logger.debug('Get task priorities endpoint called');
+
+    return await this.taskService.getTaskPriorities();
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
