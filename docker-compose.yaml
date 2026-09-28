@@ -10,8 +10,19 @@ services:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
 
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          mysql -h 127.0.0.1 -u "$$MYSQL_USER" -p"$$MYSQL_PASSWORD"
+          "$$MYSQL_DATABASE" -e 'SELECT 1' >/dev/null 2>&1
+      interval: 5s
+      timeout: 5s
+      retries: 30
     ports:
       - '${DB_PORT}:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
   mysql-test:
     image: mysql:8.4
     container_name: mysql_essential_tech_test
@@ -46,6 +57,13 @@ services:
         '${REDIS_PASSWORD}', # Password for Redis server
       ]
     restart: always
+    environment:
+      REDISCLI_AUTH: ${REDIS_PASSWORD}
+    healthcheck:
+      test: ['CMD-SHELL', "redis-cli ping | grep -q '^PONG$'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
     ports:
       - '${REDIS_PORT}:6379'
   mongo:
@@ -58,6 +76,8 @@ services:
       MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
     ports:
       - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
     healthcheck:
       test:
         - CMD-SHELL
@@ -90,3 +110,65 @@ services:
       interval: 5s
       timeout: 5s
       retries: 30
+
+  backend:
+    build:
+      context: ./backend
+    env_file:
+      - path: .env
+        required: false
+    command:
+      - sh
+      - -c
+      - ./node_modules/.bin/prisma migrate deploy --config prisma7.config.ts && exec node dist/main.js
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - >-
+          const net = require('node:net');
+          const socket = net.connect(3000, '127.0.0.1', () => {
+          socket.end(); process.exit(0);
+          });
+          socket.on('error', () => process.exit(1));
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    ports:
+      - '${BACKEND_HOST_PORT:-3000}:3000'
+
+  frontend:
+    build:
+      context: ./frontend
+    command:
+      - npm
+      - start
+      - --
+      - --host
+      - 0.0.0.0
+      - --port
+      - '4200'
+      - --proxy-config
+      - proxy.docker.conf.json
+      - --poll
+      - '1000'
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - '${FRONTEND_PORT:-4200}:4200'
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+
+volumes:
+  mysql_data:
+  mongo_data:

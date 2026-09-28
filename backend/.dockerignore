@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.git
+.agents
+.claude
+.codex
+.windsurf
+skills
+.env*
+*.log
+*.tsbuildinfo

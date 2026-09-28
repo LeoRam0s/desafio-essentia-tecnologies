@@ -2,16 +2,14 @@
 // npm install --save-dev prisma dotenv
 import { ConfigService } from '@nestjs/config';
 import dotenv from 'dotenv';
-import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig } from 'prisma/config';
 import { EnvironmentVariables } from './src/config/env.validation.js';
 
-const rootEnvPath = resolve(import.meta.dirname, '../.env');
 const backendEnvPath = resolve(import.meta.dirname, '.env');
 
 dotenv.config({
-  path: existsSync(rootEnvPath) ? rootEnvPath : backendEnvPath,
+  path: backendEnvPath,
 });
 
 const configService = new ConfigService<EnvironmentVariables>();
