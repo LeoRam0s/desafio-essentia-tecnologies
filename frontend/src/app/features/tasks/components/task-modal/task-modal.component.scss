@@ -62,6 +62,11 @@ button:focus-visible,
   font-weight: 500;
 }
 
+.required-marker {
+  color: var(--color-danger);
+  margin-left: 0.15rem;
+}
+
 .task-form input,
 .task-form select,
 .task-form textarea {
